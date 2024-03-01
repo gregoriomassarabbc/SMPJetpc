@@ -37,6 +37,9 @@ import uk.co.bbc.smpan.AODProductVersion
 import uk.co.bbc.smpan.SMP
 import uk.co.bbc.smpan.SMPBuilder
 import uk.co.bbc.smpan.VODPlayRequestBuilder
+import uk.co.bbc.smpan.audiosimulcast.mediation.AudioSimulcastPlayRequestBuilder
+import uk.co.bbc.smpan.audiosimulcast.mediation.AudioSimulcastProductName
+import uk.co.bbc.smpan.audiosimulcast.mediation.AudioSimulcastProductVersion
 import uk.co.bbc.smpan.media.PlayRequest
 import uk.co.bbc.smpan.media.model.MediaContentHoldingImage
 import uk.co.bbc.smpan.stats.ui.UserInteractionStatisticsProvider
@@ -154,6 +157,33 @@ fun SMPPlayer(modifier: Modifier = Modifier) {
                 .aspectRatio(16 / 9f)
         )
 
+        Text(
+            "Audio Simulcast",
+            modifier = Modifier
+                .padding(10.dp)
+                .align(Alignment.End)
+                .background(Color.Magenta),
+            style = TextStyle(
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.W900,
+                fontSize = 18.sp
+            )
+        )
+
+        AndroidView(
+            factory = { context ->
+                PlayerView(context).also {
+                    val smp = createSMP(context)
+                    val playRequest = playAudioSimulcastRequest(context)
+                    val embeddedPlayoutWindow = smp.embeddedPlayoutWindow(playRequest)
+                    embeddedPlayoutWindow.attachToViewGroup(it)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16 / 9f)
+        )
+
         IconButton(onClick = { /*TODO*/ }) {
             
         }
@@ -200,6 +230,21 @@ private fun playAODRequest(context: Context): PlayRequest? {
         context,
         AODProductName("AOD PRB"),
         AODProductVersion("3.0.1")
+    )
+        .forVpid(vpid, avStatisticsProvider)
+        .with(MediaContentHoldingImage("https://i.pinimg.com/originals/d9/b3/ae/d9b3ae779f3c1b95b2dbac89327924d1.jpg"))
+        .withAutoplay(true)
+        .build()
+}
+
+private fun playAudioSimulcastRequest(context: Context): PlayRequest? {
+    val avStatisticsProvider = SMPAVStatisticsProvider()
+    val vpid = "bbc_6music" // Giles Peterson
+
+    return AudioSimulcastPlayRequestBuilder(
+        context,
+        AudioSimulcastProductName("Audio Simulcast PRB"),
+        AudioSimulcastProductVersion("5.0.1")
     )
         .forVpid(vpid, avStatisticsProvider)
         .with(MediaContentHoldingImage("https://i.pinimg.com/originals/d9/b3/ae/d9b3ae779f3c1b95b2dbac89327924d1.jpg"))
