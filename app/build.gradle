@@ -53,6 +53,8 @@ dependencies {
     implementation 'uk.co.bbc:smp-an-echo-statistics'
     implementation 'uk.co.bbc:smp-android'
     implementation 'uk.co.bbc:smp-android-videosimulcast:latest.release'
+    implementation 'uk.co.bbc:smp-android-videoondemand-playrequest-builder:latest.release'
+    implementation 'uk.co.bbc:smp-android-dash-ondemand-video-exo2-decoder:latest.release'
 
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')

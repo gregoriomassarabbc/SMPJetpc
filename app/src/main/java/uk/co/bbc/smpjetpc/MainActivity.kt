@@ -28,13 +28,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.exoplayer2.ui.PlayerView
+import uk.co.bbc.smpan.ProductName as VODProductName
+import uk.co.bbc.smpan.ProductVersion as VODProductVersion
 import uk.co.bbc.smpan.SMP
 import uk.co.bbc.smpan.SMPBuilder
+import uk.co.bbc.smpan.VODPlayRequestBuilder
 import uk.co.bbc.smpan.media.PlayRequest
 import uk.co.bbc.smpan.media.model.MediaContentHoldingImage
 import uk.co.bbc.smpan.stats.ui.UserInteractionStatisticsProvider
-import uk.co.bbc.smpan.videosimulcast.mediation.ProductName
-import uk.co.bbc.smpan.videosimulcast.mediation.ProductVersion
+import uk.co.bbc.smpan.videosimulcast.mediation.ProductName as SimulcastName
+import uk.co.bbc.smpan.videosimulcast.mediation.ProductVersion as SimulcastProductVersion
 import uk.co.bbc.smpan.videosimulcast.mediation.VideoSimulcastPlayRequestBuilder
 import uk.co.bbc.smpjetpc.ui.theme.SMPJetpcTheme
 
@@ -64,9 +67,9 @@ fun SMPPlayer(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .fillMaxHeight()) {
         Text(
-            "SMP Video Simulcast",
+            "Video Simulcast",
             modifier = Modifier
-                .padding(30.dp)
+                .padding(10.dp)
                 .align(Alignment.CenterHorizontally),
             style = TextStyle(
                 fontFamily = FontFamily.Monospace,
@@ -79,7 +82,7 @@ fun SMPPlayer(modifier: Modifier = Modifier) {
             factory = { context ->
                 PlayerView(context).also {
                     val smp = createSMP(context)
-                    val playRequest = playRequest(context)
+                    val playRequest = playSimulcastRequest(context)
                     val embeddedPlayoutWindow = smp.embeddedPlayoutWindow(playRequest)
                     embeddedPlayoutWindow.attachToViewGroup(it)
                 }
@@ -91,6 +94,60 @@ fun SMPPlayer(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        Text(
+            "VOD",
+            modifier = Modifier
+                .padding(10.dp)
+                .align(Alignment.CenterHorizontally),
+            style = TextStyle(
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.W900,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            )
+        )
+
+        AndroidView(
+            factory = { context ->
+                PlayerView(context).also {
+                    val smp = createSMP(context)
+                    val playRequest = playVODRequest(context)
+                    val embeddedPlayoutWindow = smp.embeddedPlayoutWindow(playRequest)
+                    embeddedPlayoutWindow.attachToViewGroup(it)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16 / 9f)
+        )
+
+        Text(
+            "Audio Simulcast",
+            modifier = Modifier
+                .padding(10.dp)
+                .align(Alignment.CenterHorizontally),
+            style = TextStyle(
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.W900,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center
+            )
+        )
+
+        AndroidView(
+            factory = { context ->
+                PlayerView(context).also {
+                    val smp = createSMP(context)
+                    val playRequest = playVODRequest(context)
+                    val embeddedPlayoutWindow = smp.embeddedPlayoutWindow(playRequest)
+                    embeddedPlayoutWindow.attachToViewGroup(it)
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16 / 9f)
+        )
+
         IconButton(onClick = { /*TODO*/ }) {
             
         }
@@ -99,14 +156,29 @@ fun SMPPlayer(modifier: Modifier = Modifier) {
 
 }
 
-private fun playRequest(context: Context): PlayRequest? {
+private fun playSimulcastRequest(context: Context): PlayRequest? {
     val avStatisticsProvider = SMPAVStatisticsProvider()
     val vpid = "bbc_news24"
 
     return VideoSimulcastPlayRequestBuilder(
         context,
-        ProductName("My SMP App"),
-        ProductVersion("0.0.1")
+        SimulcastName("My SMP App"),
+        SimulcastProductVersion("0.0.1")
+    )
+        .forVpid(vpid, avStatisticsProvider)
+        .with(MediaContentHoldingImage("https://i.pinimg.com/originals/d9/b3/ae/d9b3ae779f3c1b95b2dbac89327924d1.jpg"))
+        .withAutoplay(true)
+        .build()
+}
+
+private fun playVODRequest(context: Context): PlayRequest? {
+    val avStatisticsProvider = SMPAVStatisticsProvider()
+    val vpid = "m001vxdm"
+
+    return VODPlayRequestBuilder(
+        context,
+        VODProductName("My SMP App"),
+        VODProductVersion("0.0.1")
     )
         .forVpid(vpid, avStatisticsProvider)
         .with(MediaContentHoldingImage("https://i.pinimg.com/originals/d9/b3/ae/d9b3ae779f3c1b95b2dbac89327924d1.jpg"))
